@@ -16,10 +16,9 @@ fn main(){
 
     for x in 0..(WIDTH+2){
         for y in 0..(HEIGHT+2){
-            density[index(x,y)] = x as f32/(WIDTH+2) as f32;
+            density[index(x,y)] = x as f32/(WIDTH+2) as f32 * y as f32/(WIDTH+2) as f32;
         }
     }
-
 
     render(&density);
 }
