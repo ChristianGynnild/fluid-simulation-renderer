@@ -4,8 +4,6 @@ use renderer::render;
 pub const WIDTH:usize = 2000;
 pub const HEIGHT:usize = 2000;
 
-use std::mem;
-
 fn index(x:usize,y:usize) -> usize{
     return x+y*(WIDTH+2)
 }
