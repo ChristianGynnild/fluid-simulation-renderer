@@ -4,7 +4,7 @@ const WIDTH:usize = super::WIDTH;
 const HEIGHT:usize = super::HEIGHT;
 
 fn save_image(vector:Vec<u8>){
-    RgbImage::from_raw(WIDTH as u32, HEIGHT as u32, vector).unwrap().save("output.png").unwrap();
+    RgbImage::from_raw(WIDTH as u32, HEIGHT as u32, vector).unwrap().save("output1.png").unwrap();
 }
 
 
