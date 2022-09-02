@@ -1,17 +1,25 @@
-use image::RgbImage;
+mod renderer;
+use renderer::render;
 
+pub const WIDTH:usize = 2000;
+pub const HEIGHT:usize = 2000;
 
-const width:usize = 32;
-const height:usize = 32;
+use std::mem;
 
-fn save_image(vector:Vec<u8>){
-    RgbImage::from_raw(width as u32, height as u32, vector);
+fn index(x:usize,y:usize) -> usize{
+    return x+y*(WIDTH+2)
 }
 
-fn main(){    
-    let density  = [[[0];height];width];
-    let density0 = [[[0];height];width];
 
-    let velocity  = [[[0,0];height];width];
-    let velocity0 = [[[0,0];height];width];
+fn main(){
+    let mut density = vec![0.;(HEIGHT+2)*(WIDTH+2)];
+
+    for x in 0..(WIDTH+2){
+        for y in 0..(HEIGHT+2){
+            density[index(x,y)] = x as f32/(WIDTH+2) as f32;
+        }
+    }
+
+
+    render(&density);
 }
