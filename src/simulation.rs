@@ -1,13 +1,16 @@
 const WIDTH:usize=super::WIDTH;
 const HEIGHT:usize=super::HEIGHT;
 
+fn lerp(a:f32, b:f32, interpolation_value:f32)->f32{
+    return a*(1.-interpolation_value)+interpolation_value*b
+}
 
 pub fn index(x:usize,y:usize) -> usize{
     return x+y*(WIDTH+2);
 }
 
 pub fn diffuse(mut attribute:Vec<f32>, attribute0:Vec<f32>, boundary:i8, diffusion_speed:f32, delta_time:f32)-> Vec<f32>{
-    let simulation_time_step = WIDTH as f32*HEIGHT as f32*diffusion_speed*delta_time;
+    let time_step = WIDTH as f32*HEIGHT as f32*diffusion_speed*delta_time;
 
     let mut average_surrounding_values:f32;
 
@@ -20,7 +23,7 @@ pub fn diffuse(mut attribute:Vec<f32>, attribute0:Vec<f32>, boundary:i8, diffusi
                     attribute[index(x  ,y+1)]+
                     attribute[index(x  ,y-1)]
                 )/4.;
-                attribute[index(x,y)] = (attribute0[index(x,y)]+average_surrounding_values*simulation_time_step)/(1.+simulation_time_step);
+                attribute[index(x,y)] = (attribute0[index(x,y)]+average_surrounding_values*time_step)/(1.+time_step);
             }
         }
         // set_boundary()
@@ -29,8 +32,42 @@ pub fn diffuse(mut attribute:Vec<f32>, attribute0:Vec<f32>, boundary:i8, diffusi
     return attribute;
 }
 
-pub fn advect(){
+pub fn advect(mut attribute:Vec<f32>, attribute0:Vec<f32>, boundary:i8, velocity_x:Vec<f32>, velocity_y:Vec<f32>, advection_speed:f32, delta_time:f32){
+    let time_step = WIDTH as f32*advection_speed*delta_time;
+    let mut position_x;
+    let mut position_y;
 
+    for x in 1..(WIDTH+1){
+        for y in 2..(HEIGHT+1){
+            position_x = x as f32-velocity_x[index(x,y)]*time_step;
+            position_y = y as f32-velocity_y[index(x,y)]*time_step;
+
+            if (position_x<0.5) {position_x=0.5}; 
+            if (position_y<0.5) {position_y=0.5}; 
+
+            if (position_x>WIDTH as f32+0.5) {position_x=WIDTH as f32 + 0.5}; 
+            if (position_y>HEIGHT as f32+0.5) {position_y=HEIGHT as f32 + 0.5; 
+                
+            let floored_position_x = position_x as usize;
+            let floored_position_y = position_y as usize;
+
+            attribute[index(x,y)] = lerp(
+                lerp(
+                    attribute0[index(floored_position_x, floored_position_y)], 
+                    attribute0[index(floored_position_x+1, floored_position_y)],
+                    floored_position_x as f32 - position_x
+                ),
+                lerp(
+                    attribute0[index(floored_position_x, floored_position_y+1)], 
+                    attribute0[index(floored_position_x+1, floored_position_y+1)],
+                    floored_position_x as f32 - position_x
+                ),
+                floored_position_y as f32 - position_y
+            )
+        }
+    }
+
+    //set_boundary()
 }
 
 pub fn remove_divergence(){
