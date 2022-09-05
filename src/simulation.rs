@@ -10,7 +10,7 @@ pub fn index(x:usize,y:usize) -> usize{
     return x+y*(WIDTH+2);
 }
 
-pub fn diffuse(mut attribute:Vec<f32>, attribute0:Vec<f32>, boundary:i8, diffusion_speed:f32, delta_time:f32)-> Vec<f32>{
+pub fn diffuse(mut attribute:Vec<f32>, attribute0:Vec<f32>, dimension:i8, diffusion_speed:f32, delta_time:f32)-> Vec<f32>{
     let time_step = WIDTH as f32*HEIGHT as f32*diffusion_speed*delta_time;
 
     let mut average_surrounding_values:f32;
@@ -27,13 +27,13 @@ pub fn diffuse(mut attribute:Vec<f32>, attribute0:Vec<f32>, boundary:i8, diffusi
                 attribute[index(x,y)] = (attribute0[index(x,y)]+average_surrounding_values*time_step)/(1.+time_step);
             }
         }
-        // set_boundary()
+        attribute = set_boundary(attribute, dimension);
     }
 
     return attribute;
 }
 
-pub fn advect(mut attribute:Vec<f32>, attribute0:Vec<f32>, boundary:i8, velocity_x:Vec<f32>, velocity_y:Vec<f32>, advection_speed:f32, delta_time:f32){
+pub fn advect(mut attribute:Vec<f32>, attribute0:Vec<f32>, dimension:i8, velocity_x:Vec<f32>, velocity_y:Vec<f32>, advection_speed:f32, delta_time:f32) -> Vec<f32>{
     let time_step = WIDTH as f32*advection_speed*delta_time;
     let mut position_x;
     let mut position_y;
@@ -68,7 +68,9 @@ pub fn advect(mut attribute:Vec<f32>, attribute0:Vec<f32>, boundary:i8, velocity
         }
     }
 
-    //set_boundary()
+    attribute = set_boundary(attribute, dimension);
+
+    return attribute;
 }
 
 pub fn remove_divergence(mut velocity_x:Vec<f32>, mut velocity_y:Vec<f32>) -> (Vec<f32>, Vec<f32>){
@@ -86,7 +88,7 @@ pub fn remove_divergence(mut velocity_x:Vec<f32>, mut velocity_y:Vec<f32>) -> (V
         }
     }
 
-    //set boundary(div)
+    divergence = set_boundary(divergence, 0);
 
     for i in 0..20{
         for x in 1..(WIDTH+1){
@@ -94,7 +96,7 @@ pub fn remove_divergence(mut velocity_x:Vec<f32>, mut velocity_y:Vec<f32>) -> (V
                 p[index(x, y)] = (p[index(x+1,y)]+p[index(x-1,y)]+p[index(x,y+1)]+p[index(x,y-1)]-divergence[index(x,y)])/4.;
             }
         }
-        //set_boundary(p)
+        p = set_boundary(p, 0);
     }
 
     for x in 1..(WIDTH+1){
