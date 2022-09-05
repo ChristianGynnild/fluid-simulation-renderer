@@ -26,7 +26,7 @@ fn main(){
     }
 
     //density = simulation::diffuse(density, density0, 1, 1., 0.00001);
-
+    
  
     //render(&density0);
 }

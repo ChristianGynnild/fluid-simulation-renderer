@@ -71,7 +71,7 @@ pub fn advect(mut attribute:Vec<f32>, attribute0:Vec<f32>, boundary:i8, velocity
     //set_boundary()
 }
 
-pub fn remove_divergence(mut velocity_x:Vec<f32>, mut velocity_y:Vec<f32>){
+pub fn remove_divergence(mut velocity_x:Vec<f32>, mut velocity_y:Vec<f32>) -> (Vec<f32>, Vec<f32>){
     
     let mut divergence = vec![0.;(WIDTH+2)*(HEIGHT+2)];
     let mut p = vec![0.;(WIDTH+2)*(HEIGHT+2)];
@@ -104,4 +104,40 @@ pub fn remove_divergence(mut velocity_x:Vec<f32>, mut velocity_y:Vec<f32>){
         }
     }
 
+    return (velocity_x, velocity_y)
+}
+
+
+fn set_boundary(mut attribute:Vec<f32>, dimension:i8) -> Vec<f32>
+{
+    for x in 1..(WIDTH+1){
+        attribute[index(x, 0)] = match dimension{
+            2 => -attribute[index(x, 1)],
+            _ =>  attribute[index(x, 1)]
+        };
+
+        attribute[index(x, HEIGHT+1)] = match dimension{
+            2 => -attribute[index(x, HEIGHT)],
+            _ =>  attribute[index(x, HEIGHT)]
+        };
+    }
+
+    for y in 1..(HEIGHT+1){
+        attribute[index(0, y)] = match dimension{
+            1 => -attribute[index(1, y)],
+            _ =>  attribute[index(1, y)]
+        };
+
+        attribute[index(WIDTH+1, y)] = match dimension{
+            1 => -attribute[index(WIDTH, y)],
+            _ =>  attribute[index(WIDTH, y)]
+        };
+    }
+
+    attribute[index(0,0)] = (attribute[index(1,0)]+attribute[index(0,1)])/2.;
+    attribute[index(WIDTH+1,0)] = (attribute[index(WIDTH,0)]+attribute[index(WIDTH+1,1)])/2.;
+    attribute[index(0,HEIGHT+1)] = (attribute[index(0,HEIGHT)]+attribute[index(1,HEIGHT+1)])/2.;
+    attribute[index(WIDTH+1,HEIGHT+1)] = (attribute[index(WIDTH,HEIGHT+1)]+attribute[index(WIDTH+1,HEIGHT)])/2.;
+
+    return attribute;
 }
