@@ -27,10 +27,10 @@ fn main(){
 
     density0 = density.to_vec();
 
-    
     density = simulation::diffuse(density, density0, 0, 0.005, 0.01);
 
-    render(&density);
+    std::fs::create_dir_all("images");
+    render(&density, "images/output.png");
 
     
 }
