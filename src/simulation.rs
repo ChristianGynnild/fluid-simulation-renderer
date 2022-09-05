@@ -1,6 +1,7 @@
 const WIDTH:usize=super::WIDTH;
 const HEIGHT:usize=super::HEIGHT;
 
+
 fn lerp(a:f32, b:f32, interpolation_value:f32)->f32{
     return a*(1.-interpolation_value)+interpolation_value*b
 }
@@ -46,7 +47,7 @@ pub fn advect(mut attribute:Vec<f32>, attribute0:Vec<f32>, boundary:i8, velocity
             if (position_y<0.5) {position_y=0.5}; 
 
             if (position_x>WIDTH as f32+0.5) {position_x=WIDTH as f32 + 0.5}; 
-            if (position_y>HEIGHT as f32+0.5) {position_y=HEIGHT as f32 + 0.5; 
+            if (position_y>HEIGHT as f32+0.5) {position_y=HEIGHT as f32 + 0.5}; 
                 
             let floored_position_x = position_x as usize;
             let floored_position_y = position_y as usize;
@@ -70,6 +71,37 @@ pub fn advect(mut attribute:Vec<f32>, attribute0:Vec<f32>, boundary:i8, velocity
     //set_boundary()
 }
 
-pub fn remove_divergence(){
+pub fn remove_divergence(mut velocity_x:Vec<f32>, mut velocity_y:Vec<f32>){
+    
+    let mut divergence = vec![0.;(WIDTH+2)*(HEIGHT+2)];
+    let mut p = vec![0.;(WIDTH+2)*(HEIGHT+2)];
+
+    for x in 1..(WIDTH+1){
+        for y in 1..(HEIGHT+1){
+            divergence[index(x,y)] = 
+                (
+                    (velocity_x[index(x+1,y)]-velocity_x[index(x-1,y)])-
+                    (velocity_y[index(x,y+1)]-velocity_y[index(x,y-1)])
+                ) * 0.5;
+        }
+    }
+
+    //set boundary(div)
+
+    for i in 0..20{
+        for x in 1..(WIDTH+1){
+            for y in 1..(HEIGHT+1){
+                p[index(x, y)] = (p[index(x+1,y)]+p[index(x-1,y)]+p[index(x,y+1)]+p[index(x,y-1)]-divergence[index(x,y)])/4.;
+            }
+        }
+        //set_boundary(p)
+    }
+
+    for x in 1..(WIDTH+1){
+        for y in 1..(HEIGHT+1){
+            velocity_x[index(x, y)] -= 0.5*(p[index(x+1,y)]-p[index(x-1,y)]);
+            velocity_y[index(x, y)] -= 0.5*(p[index(x,y+1)]-p[index(x,y-1)]);
+        }
+    }
 
 }

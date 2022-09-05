@@ -3,8 +3,8 @@ use renderer::render;
 mod simulation;
 use simulation::index;
 
-pub const WIDTH:usize = 2000;
-pub const HEIGHT:usize = 2000;
+pub const WIDTH:usize = 9;
+pub const HEIGHT:usize = 9;
 
 
 
@@ -27,5 +27,6 @@ fn main(){
 
     //density = simulation::diffuse(density, density0, 1, 1., 0.00001);
 
-    render(&density0);
+ 
+    //render(&density0);
 }
