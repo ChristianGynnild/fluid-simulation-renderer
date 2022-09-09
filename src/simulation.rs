@@ -10,12 +10,12 @@ pub fn index(x:usize,y:usize) -> usize{
     return x+y*(WIDTH+2);
 }
 
-pub fn diffuse(mut attribute:Vec<f32>, attribute0:Vec<f32>, dimension:i8, diffusion_speed:f32, delta_time:f32)-> Vec<f32>{
+pub fn diffuse(mut attribute:Vec<f32>, attribute0:&Vec<f32>, dimension:i8, diffusion_speed:f32, delta_time:f32)-> Vec<f32>{
     let time_step = WIDTH as f32*HEIGHT as f32*diffusion_speed*delta_time;
 
     let mut average_surrounding_values:f32;
 
-    for i in 0..20{
+    for i in 0..100{
         for x in 1..(WIDTH+1){
             for y in 1..(HEIGHT+1){
                 average_surrounding_values = (
@@ -33,7 +33,7 @@ pub fn diffuse(mut attribute:Vec<f32>, attribute0:Vec<f32>, dimension:i8, diffus
     return attribute;
 }
 
-pub fn advect(mut attribute:Vec<f32>, attribute0:Vec<f32>, dimension:i8, velocity_x:Vec<f32>, velocity_y:Vec<f32>, advection_speed:f32, delta_time:f32) -> Vec<f32>{
+pub fn advect(mut attribute:Vec<f32>, attribute0:&Vec<f32>, dimension:i8, velocity_x:&Vec<f32>, velocity_y:&Vec<f32>, advection_speed:f32, delta_time:f32) -> Vec<f32>{
     let time_step = WIDTH as f32*advection_speed*delta_time;
     let mut position_x;
     let mut position_y;
@@ -110,7 +110,7 @@ pub fn remove_divergence(mut velocity_x:Vec<f32>, mut velocity_y:Vec<f32>) -> (V
 }
 
 
-fn set_boundary(mut attribute:Vec<f32>, dimension:i8) -> Vec<f32>
+pub fn set_boundary(mut attribute:Vec<f32>, dimension:i8) -> Vec<f32>
 {
     for x in 1..(WIDTH+1){
         attribute[index(x, 0)] = match dimension{
