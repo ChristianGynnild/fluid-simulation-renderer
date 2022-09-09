@@ -10,6 +10,17 @@ pub fn index(x:usize,y:usize) -> usize{
     return x+y*(WIDTH+2);
 }
 
+fn add_source(N:i32, mut x:Vec<f32>, mut s:&Vec<f32>, dt:f32) -> Vec<f32>
+{ 
+    let size=(N+2)*(N+2);
+    for i in (0 as usize)..size as usize{
+        x[i] += dt*s[i];
+    }
+
+    return x;
+}
+
+
 pub fn diffuse(mut attribute:Vec<f32>, attribute0:&Vec<f32>, dimension:i8, diffusion_speed:f32, delta_time:f32)-> Vec<f32>{
     let time_step = WIDTH as f32*HEIGHT as f32*diffusion_speed*delta_time;
 
