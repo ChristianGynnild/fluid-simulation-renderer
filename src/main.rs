@@ -1,7 +1,7 @@
 mod renderer;
 use renderer::render;
 mod simulation;
-use simulation::index;
+use simulation::IX;
 
 pub const WIDTH:usize = 200;
 pub const HEIGHT:usize = 200;
@@ -20,7 +20,7 @@ fn main(){
     for x in 1..(WIDTH+1){
         for y in 1..(HEIGHT+1){
             if x > WIDTH/2{
-                density0[index(x,y)] = 1.;
+                density0[IX(x,y)] = 1.;
             }
         }
     }
@@ -28,7 +28,7 @@ fn main(){
     for x in 1..(WIDTH+1){
         for y in 1..(WIDTH+1){
             let (velocity_init_x, velocity_init_y):(f32, f32) = ((x as f32-(WIDTH/2) as f32), (y as f32-(HEIGHT/2) as f32));
-            (velocityX0[index(x,y)], velocityY0[index(x,y)]) = (-velocity_init_y, velocity_init_x);
+            (velocityX0[IX(x,y)], velocityY0[IX(x,y)]) = (-velocity_init_y, velocity_init_x);
         }
     }
 
