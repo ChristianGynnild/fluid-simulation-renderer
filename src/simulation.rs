@@ -77,51 +77,48 @@ fn vel_step(N:i32, mut u:Vec<f32>, mut v:Vec<f32>, mut u0:Vec<f32>, mut v0:Vec<f
     (v, v0) = (v0, v);
     u = diffuse(N, 1, u, &u0, visc, dt);
     v = diffuse(N, 2, v, &v0, visc, dt);
-    project(N, u, v, &u0, &v0);
+    (u, v, u0, v0) = project(N, u, v, u0, v0);
     (u, u0) = (u0, u); 
     (v, v0) = (v0, v);
     u = advect(N, 1, u, &u0, &u0, &v0, dt );
     v = advect ( N, 2, v, &v0, &u0, &v0, dt);
-    project(N, u, v, &u0, &v0);
+    (u, v, u0, v0) = project(N, u, v, u0, v0);
 }
 
 
-pub fn remove_divergence(mut velocity_x:Vec<f32>, mut velocity_y:Vec<f32>) -> (Vec<f32>, Vec<f32>){
-    
-    let mut divergence = vec![0.;(WIDTH+2)*(HEIGHT+2)];
-    let mut p = vec![0.;(WIDTH+2)*(HEIGHT+2)];
+fn project(N:i32, mut u:Vec<f32>, mut v:Vec<f32>, mut p:Vec<f32>, mut div:Vec<f32>) -> (Vec<f32>, Vec<f32>, Vec<f32>, Vec<f32>)
+{
+    let h:f32 = 1.0/N as f32;
 
-    for x in 1..(WIDTH+1){
-        for y in 1..(HEIGHT+1){
-            divergence[IX(x,y)] = 
-                (
-                    (velocity_x[IX(x+1,y)]-velocity_x[IX(x-1,y)])-
-                    (velocity_y[IX(x,y+1)]-velocity_y[IX(x,y-1)])
-                ) * 0.5;
+    for i in 1..N{
+        for j in 1..N{
+            div[IX(i,j)] = -0.5*h*(u[IX(i+1,j)]-u[IX(i-1,j)]+
+            v[IX(i,j+1)]-v[IX(i,j-1)]);
+            p[IX(i,j)] = 0.;
         }
     }
-
-    divergence = set_boundary(divergence, 0);
-
-    for i in 0..20{
-        for x in 1..(WIDTH+1){
-            for y in 1..(HEIGHT+1){
-                p[IX(x, y)] = (p[IX(x+1,y)]+p[IX(x-1,y)]+p[IX(x,y+1)]+p[IX(x,y-1)]-divergence[IX(x,y)])/4.;
+    set_bnd(N, 0, div);
+    set_bnd(N, 0, p);
+    for k in 0..20{
+        for i in 1..N{
+            for j in 1..N{
+                p[IX(i,j)] = (div[IX( i,j)]+p[IX(i-1,j)]+p[IX(i+1,j)]+
+                p[IX(i,j-1)]+p[IX(i,j+1)])/4.;
             }
         }
-        p = set_boundary(p, 0);
+        set_bnd(N, 0, p);
     }
-
-    for x in 1..(WIDTH+1){
-        for y in 1..(HEIGHT+1){
-            velocity_x[IX(x, y)] -= 0.5*(p[IX(x+1,y)]-p[IX(x-1,y)]);
-            velocity_y[IX(x, y)] -= 0.5*(p[IX(x,y+1)]-p[IX(x,y-1)]);
+    for i in 1..N{
+        for j in 1..N{
+            u[IX(i,j)] -= 0.5*(p[IX(i+1,j)]-p[IX(i-1,j)])/h;
+            v[IX(i,j)] -= 0.5*(p[IX(i,j+1)]-p[IX(i,j-1)])/h;
         }
     }
+    set_bnd( N, 1, u);
+    set_bnd( N, 2, v);
 
-    return (velocity_x, velocity_y)
+    return (u, v, p, div);
 }
-
 
 pub fn set_boundary(mut attribute:Vec<f32>, dimension:i8) -> Vec<f32>
 {
