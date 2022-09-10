@@ -3,57 +3,38 @@ use renderer::render;
 mod simulation;
 use simulation::IX;
 
-pub const WIDTH:usize = 200;
-pub const HEIGHT:usize = 200;
+pub const WIDTH:i32 = 200;
+pub const HEIGHT:i32 = 200;
 
+pub const N:i32 = 64;
 
 fn main(){
-    let mut density0 = vec![0.;(HEIGHT+2)*(WIDTH+2)];
-    let mut density = vec![0.;(HEIGHT+2)*(WIDTH+2)];
+    let mut dens_prev = vec![0.;(N as usize+2)*(N as usize+2)];
+    let mut dens = vec![0.;(N as usize+2)*(N as usize+2)];
 
-    let mut velocityX0 = vec![0.;(HEIGHT+2)*(WIDTH+2)];
-    let mut velocityY0 = vec![0.;(HEIGHT+2)*(WIDTH+2)];
+    let mut u_prev = vec![0.;(N as usize+2)*(N as usize+2)];
+    let mut v_prev = vec![0.;(N as usize+2)*(N as usize+2)];
     
-    let mut velocityX = vec![0.;(HEIGHT+2)*(WIDTH+2)];
-    let mut velocityY = vec![0.;(HEIGHT+2)*(WIDTH+2)];
+    let mut u = vec![0.;(N as usize+2)*(N as usize+2)];
+    let mut v = vec![0.;(N as usize+2)*(N as usize+2)];
 
-    for x in 1..(WIDTH+1){
-        for y in 1..(HEIGHT+1){
-            if x > WIDTH/2{
-                density0[IX(x,y)] = 1.;
-            }
-        }
-    }
+    let visc = 0.001;
+    let diff = 0.0001;
+    let dt = 0.01;
 
-    for x in 1..(WIDTH+1){
-        for y in 1..(WIDTH+1){
-            let (velocity_init_x, velocity_init_y):(f32, f32) = ((x as f32-(WIDTH/2) as f32), (y as f32-(HEIGHT/2) as f32));
-            (velocityX0[IX(x,y)], velocityY0[IX(x,y)]) = (-velocity_init_y, velocity_init_x);
-        }
-    }
-
-    density0 = simulation::set_boundary(density0, 0);
-    (velocityX, velocityY, velocityX0, velocityY0) = (velocityX0, velocityY0, velocityX, velocityY);
+    dens_prev = simulation::set_bnd(N, 0, dens_prev);
+    (u, v, u_prev, v_prev) = (u_prev, v_prev, u, v);
 
 
     std::fs::create_dir_all("images");
+    let filepath;
 
-    let mut filepath = format!("images/output{}.png", 0);
-    println!("Rendering frame {}", 0);
-    render(&density0, &filepath);
-
-    for i in 1..100{    
-        density = simulation::diffuse(density, &density0, 0, 0.01, 0.01);
-        (density, density0) = (density0, density);
-        density = simulation::advect(density, &density0, 0, &velocityX, &velocityY, 1., 0.01);
-        (density, density0) = (density0, density);
-
-        
+    for i in 0..100{        
         filepath = format!("images/output{}.png", i);
         println!("Rendering frame {}", i);
-        render(&density0, &filepath);
-    }
-
-
+        render(&dens_prev, &filepath);
     
+        (u, v, u_prev, v_prev) = simulation::vel_step(N, u, v, u_prev, v_prev, visc, dt);
+        (dens, dens_prev) = simulation::dens_step(N, dens, dens_prev, &u, &v, diff, dt);
+    }
 }

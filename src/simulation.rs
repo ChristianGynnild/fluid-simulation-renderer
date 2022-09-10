@@ -1,5 +1,5 @@
-const WIDTH:usize=super::WIDTH;
-const HEIGHT:usize=super::HEIGHT;
+const WIDTH:i32=super::WIDTH;
+const HEIGHT:i32=super::HEIGHT;
 
 
 fn lerp(a:f32, b:f32, interpolation_value:f32)->f32{
@@ -7,7 +7,7 @@ fn lerp(a:f32, b:f32, interpolation_value:f32)->f32{
 }
 
 pub fn IX(x:i32,y:i32) -> usize{
-    return x as usize+y as usize*(WIDTH+2);
+    return x as usize+y as usize*(WIDTH as usize+2);
 }
 
 fn add_source(N:i32, mut x:Vec<f32>, mut s:&Vec<f32>, dt:f32) -> Vec<f32>
@@ -58,7 +58,7 @@ fn advect(N:i32, b:i32, mut d:Vec<f32>, d0:&Vec<f32>, u:&Vec<f32>, v:&Vec<f32>, 
 }
 
 
-fn dens_step(N:i32, mut x:Vec<f32>, mut x0:Vec<f32>, u:&Vec<f32>, v:&Vec<f32>, diff:f32, dt:f32) -> (Vec<f32>, Vec<f32>)
+pub fn dens_step(N:i32, mut x:Vec<f32>, mut x0:Vec<f32>, u:&Vec<f32>, v:&Vec<f32>, diff:f32, dt:f32) -> (Vec<f32>, Vec<f32>)
 {
     x = add_source( N, x, &x0, dt );
     (x,x0) = (x0, x); 
@@ -69,7 +69,7 @@ fn dens_step(N:i32, mut x:Vec<f32>, mut x0:Vec<f32>, u:&Vec<f32>, v:&Vec<f32>, d
     return (x, x0);
 }
 
-fn vel_step(N:i32, mut u:Vec<f32>, mut v:Vec<f32>, mut u0:Vec<f32>, mut v0:Vec<f32>, visc:f32, dt:f32) -> (Vec<f32>, Vec<f32>, Vec<f32>, Vec<f32>)
+pub fn vel_step(N:i32, mut u:Vec<f32>, mut v:Vec<f32>, mut u0:Vec<f32>, mut v0:Vec<f32>, visc:f32, dt:f32) -> (Vec<f32>, Vec<f32>, Vec<f32>, Vec<f32>)
 {
     u = add_source(N, u, &u0, dt );
     v = add_source(N, v, &v0, dt);
@@ -83,6 +83,8 @@ fn vel_step(N:i32, mut u:Vec<f32>, mut v:Vec<f32>, mut u0:Vec<f32>, mut v0:Vec<f
     u = advect(N, 1, u, &u0, &u0, &v0, dt );
     v = advect ( N, 2, v, &v0, &u0, &v0, dt);
     (u, v, u0, v0) = project(N, u, v, u0, v0);
+
+    return (u, v, u0, v0);
 }
 
 
@@ -120,7 +122,7 @@ fn project(N:i32, mut u:Vec<f32>, mut v:Vec<f32>, mut p:Vec<f32>, mut div:Vec<f3
     return (u, v, p, div);
 }
 
-fn set_bnd(N:i32, b:i32, mut x:Vec<f32>) -> Vec<f32>
+pub fn set_bnd(N:i32, b:i32, mut x:Vec<f32>) -> Vec<f32>
 {
     for i in 1..N{
         x[IX(0 ,i)] = match b==1 {true => -x[IX(1,i)], false => x[IX(1,i)]};
@@ -134,4 +136,27 @@ fn set_bnd(N:i32, b:i32, mut x:Vec<f32>) -> Vec<f32>
     x[IX(N+1,N+1)] = 0.5*(x[IX(N,N+1)]+x[IX(N+1,N )]);
 
     return x;
+}
+
+pub fn init_density(N:i32, d:Vec<f32>) -> Vec<f32>{
+    for x in 1..(N+1){
+        for y in 1..(N+1){
+            if x > N/2{
+                d[IX(x,y)] = 1.;
+            }
+        }
+    }
+
+    return d;
+}
+
+pub fn init_velocity(N:i32, u:Vec<f32>, v:Vec<f32>) -> (Vec<f32>, Vec<f32>){
+    for x in 1..(N+1){
+        for y in 1..(N+1){
+            let (velocity_init_x, velocity_init_y):(f32, f32) = ((x as f32-(N/2) as f32), (y as f32-(N/2) as f32));
+            (u[IX(x,y)], v[IX(x,y)]) = (-velocity_init_y, velocity_init_x);
+        }
+    }
+
+    return (u, v);
 }
