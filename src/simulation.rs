@@ -30,7 +30,7 @@ fn diffuse(N:i32, b:i32, mut x:Vec<f32>, x0:&Vec<f32>, diff:f32, dt:f32) -> Vec<
                 x[IX(i,j-1)]+x[IX(i,j+1)]))/(1.+4.*a);
             }
         }
-    set_bnd( N, b, x );
+        x = set_bnd( N, b, x);
     }
 
     return x;
@@ -38,8 +38,8 @@ fn diffuse(N:i32, b:i32, mut x:Vec<f32>, x0:&Vec<f32>, diff:f32, dt:f32) -> Vec<
 
 fn advect(N:i32, b:i32, mut d:Vec<f32>, d0:&Vec<f32>, u:&Vec<f32>, v:&Vec<f32>, dt:f32) -> Vec<f32>
 {
-    let (x, y, i0, j0, i1, j1);
-    let (x, y, s0, t0, s1, t1, dt0);
+    let (i0, j0, i1, j1):(i32, i32, i32, i32);
+    let (x, y, s0, t0, s1, t1, dt0):(f32, f32, f32, f32, f32, f32, f32);
 
     let dt0 = dt*N as f32;
     for i in 1..N{
@@ -52,7 +52,7 @@ fn advect(N:i32, b:i32, mut d:Vec<f32>, d0:&Vec<f32>, u:&Vec<f32>, v:&Vec<f32>, 
             s1*(t0*d0[IX(i1,j0)]+t1*d0[IX(i1,j1)]);
         }
     }
-    set_bnd( N, b, d );
+    d = set_bnd( N, b, d );
 
     return d;
 }
@@ -97,8 +97,8 @@ fn project(N:i32, mut u:Vec<f32>, mut v:Vec<f32>, mut p:Vec<f32>, mut div:Vec<f3
             p[IX(i,j)] = 0.;
         }
     }
-    set_bnd(N, 0, div);
-    set_bnd(N, 0, p);
+    div = set_bnd(N, 0, div);
+    p = set_bnd(N, 0, p);
     for k in 0..20{
         for i in 1..N{
             for j in 1..N{
@@ -106,7 +106,7 @@ fn project(N:i32, mut u:Vec<f32>, mut v:Vec<f32>, mut p:Vec<f32>, mut div:Vec<f3
                 p[IX(i,j-1)]+p[IX(i,j+1)])/4.;
             }
         }
-        set_bnd(N, 0, p);
+        p = set_bnd(N, 0, p);
     }
     for i in 1..N{
         for j in 1..N{
@@ -114,8 +114,8 @@ fn project(N:i32, mut u:Vec<f32>, mut v:Vec<f32>, mut p:Vec<f32>, mut div:Vec<f3
             v[IX(i,j)] -= 0.5*(p[IX(i,j+1)]-p[IX(i,j-1)])/h;
         }
     }
-    set_bnd( N, 1, u);
-    set_bnd( N, 2, v);
+    u = set_bnd( N, 1, u);
+    v = set_bnd( N, 2, v);
 
     return (u, v, p, div);
 }
