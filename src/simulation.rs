@@ -120,36 +120,18 @@ fn project(N:i32, mut u:Vec<f32>, mut v:Vec<f32>, mut p:Vec<f32>, mut div:Vec<f3
     return (u, v, p, div);
 }
 
-pub fn set_boundary(mut attribute:Vec<f32>, dimension:i8) -> Vec<f32>
+fn set_bnd(N:i32, b:i32, mut x:Vec<f32>) -> Vec<f32>
 {
-    for x in 1..(WIDTH+1){
-        attribute[IX(x, 0)] = match dimension{
-            2 => -attribute[IX(x, 1)],
-            _ =>  attribute[IX(x, 1)]
-        };
-
-        attribute[IX(x, HEIGHT+1)] = match dimension{
-            2 => -attribute[IX(x, HEIGHT)],
-            _ =>  attribute[IX(x, HEIGHT)]
-        };
+    for i in 1..N{
+        x[IX(0 ,i)] = match b==1 {true => -x[IX(1,i)], false => x[IX(1,i)]};
+        x[IX(N+1,i)] = match b==1 {true => -x[IX(N,i)], false => x[IX(N,i)]};
+        x[IX(i,0 )] = match b==2 {true => -x[IX(i,1)], false => x[IX(i,1)]};
+        x[IX(i,N+1)] = match b==2 {true => -x[IX(i,N)], false => x[IX(i,N)]};
     }
+    x[IX(0 ,0 )] = 0.5*(x[IX(1,0 )]+x[IX(0 ,1)]);
+    x[IX(0 ,N+1)] = 0.5*(x[IX(1,N+1)]+x[IX(0 ,N )]);
+    x[IX(N+1,0 )] = 0.5*(x[IX(N,0 )]+x[IX(N+1,1)]);
+    x[IX(N+1,N+1)] = 0.5*(x[IX(N,N+1)]+x[IX(N+1,N )]);
 
-    for y in 1..(HEIGHT+1){
-        attribute[IX(0, y)] = match dimension{
-            1 => -attribute[IX(1, y)],
-            _ =>  attribute[IX(1, y)]
-        };
-
-        attribute[IX(WIDTH+1, y)] = match dimension{
-            1 => -attribute[IX(WIDTH, y)],
-            _ =>  attribute[IX(WIDTH, y)]
-        };
-    }
-
-    attribute[IX(0,0)] = (attribute[IX(1,0)]+attribute[IX(0,1)])/2.;
-    attribute[IX(WIDTH+1,0)] = (attribute[IX(WIDTH,0)]+attribute[IX(WIDTH+1,1)])/2.;
-    attribute[IX(0,HEIGHT+1)] = (attribute[IX(0,HEIGHT)]+attribute[IX(1,HEIGHT+1)])/2.;
-    attribute[IX(WIDTH+1,HEIGHT+1)] = (attribute[IX(WIDTH,HEIGHT+1)]+attribute[IX(WIDTH+1,HEIGHT)])/2.;
-
-    return attribute;
+    return x;
 }
