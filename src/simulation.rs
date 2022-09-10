@@ -60,14 +60,31 @@ fn advect(N:i32, b:i32, mut d:Vec<f32>, d0:&Vec<f32>, u:&Vec<f32>, v:&Vec<f32>, 
 
 fn dens_step(N:i32, mut x:Vec<f32>, mut x0:Vec<f32>, u:&Vec<f32>, v:&Vec<f32>, diff:f32, dt:f32) -> (Vec<f32>, Vec<f32>)
 {
-    add_source ( N, x, &x0, dt );
+    x = add_source( N, x, &x0, dt );
     (x,x0) = (x0, x); 
-    diffuse ( N, 0, x, &x0, diff, dt );
+    x = diffuse(N, 0, x, &x0, diff, dt );
     (x,x0) = (x0, x);
-    advect ( N, 0, x, &x0, u, v, dt );
+    x = advect( N, 0, x, &x0, u, v, dt );
 
     return (x, x0);
 }
+
+fn vel_step(N:i32, mut u:Vec<f32>, mut v:Vec<f32>, mut u0:Vec<f32>, mut v0:Vec<f32>, visc:f32, dt:f32) -> (Vec<f32>, Vec<f32>, Vec<f32>, Vec<f32>)
+{
+    u = add_source(N, u, &u0, dt );
+    v = add_source(N, v, &v0, dt);
+    (u, u0) = (u0, u); 
+    (v, v0) = (v0, v);
+    u = diffuse(N, 1, u, &u0, visc, dt);
+    v = diffuse(N, 2, v, &v0, visc, dt);
+    project(N, u, v, &u0, &v0);
+    (u, u0) = (u0, u); 
+    (v, v0) = (v0, v);
+    u = advect(N, 1, u, &u0, &u0, &v0, dt );
+    v = advect ( N, 2, v, &v0, &u0, &v0, dt);
+    project(N, u, v, &u0, &v0);
+}
+
 
 pub fn remove_divergence(mut velocity_x:Vec<f32>, mut velocity_y:Vec<f32>) -> (Vec<f32>, Vec<f32>){
     
