@@ -36,44 +36,25 @@ fn diffuse(N:i32, b:i32, mut x:Vec<f32>, x0:&Vec<f32>, diff:f32, dt:f32) -> Vec<
     return x;
 }
 
-pub fn advect(mut attribute:Vec<f32>, attribute0:&Vec<f32>, dimension:i8, velocity_x:&Vec<f32>, velocity_y:&Vec<f32>, advection_speed:f32, delta_time:f32) -> Vec<f32>{
-    let time_step = WIDTH as f32*advection_speed*delta_time;
-    let mut position_x;
-    let mut position_y;
+fn advect(N:i32, b:i32, mut d:Vec<f32>, d0:&Vec<f32>, u:&Vec<f32>, v:&Vec<f32>, dt:f32) -> Vec<f32>
+{
+    let (x, y, i0, j0, i1, j1);
+    let (x, y, s0, t0, s1, t1, dt0);
 
-    for x in 1..(WIDTH+1){
-        for y in 2..(HEIGHT+1){
-            position_x = x as f32-velocity_x[IX(x,y)]*time_step;
-            position_y = y as f32-velocity_y[IX(x,y)]*time_step;
-
-            if (position_x<0.5) {position_x=0.5}; 
-            if (position_y<0.5) {position_y=0.5}; 
-
-            if (position_x>WIDTH as f32+0.5) {position_x=WIDTH as f32 + 0.5}; 
-            if (position_y>HEIGHT as f32+0.5) {position_y=HEIGHT as f32 + 0.5}; 
-                
-            let floored_position_x = position_x as usize;
-            let floored_position_y = position_y as usize;
-
-            attribute[IX(x,y)] = lerp(
-                lerp(
-                    attribute0[IX(floored_position_x, floored_position_y)], 
-                    attribute0[IX(floored_position_x+1, floored_position_y)],
-                    floored_position_x as f32 - position_x
-                ),
-                lerp(
-                    attribute0[IX(floored_position_x, floored_position_y+1)], 
-                    attribute0[IX(floored_position_x+1, floored_position_y+1)],
-                    floored_position_x as f32 - position_x
-                ),
-                floored_position_y as f32 - position_y
-            )
+    let dt0 = dt*N as f32;
+    for i in 1..N{
+        for j in 1..N{
+            x = i as f32-dt0*u[IX(i,j)]; y = j as f32 -dt0*v[IX(i,j)];
+            if (x<0.5){x=0.5}; if (x>N as f32+0.5){x=N as f32 + 0.5}; i0=x as i32; i1=i0+ 1;
+            if (y<0.5){y=0.5}; if (y>N as f32+0.5){y=N as f32 + 0.5}; j0=y as i32; j1=j0+1;
+            s1 = x-i0 as f32; s0 = 1.-s1; t1 = y-j0 as f32; t0 = 1.-t1;
+            d[IX(i,j)] = s0*(t0*d0[IX(i0,j0)]+t1*d0[IX(i0,j1)])+
+            s1*(t0*d0[IX(i1,j0)]+t1*d0[IX(i1,j1)]);
         }
     }
+    set_bnd( N, b, d );
 
-    attribute = set_boundary(attribute, dimension);
-
-    return attribute;
+    return d;
 }
 
 pub fn remove_divergence(mut velocity_x:Vec<f32>, mut velocity_y:Vec<f32>) -> (Vec<f32>, Vec<f32>){
