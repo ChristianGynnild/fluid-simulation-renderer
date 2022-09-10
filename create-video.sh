@@ -1,1 +1,0 @@
-ffmpeg -framerate 25 -i images/output%d.png output.mp4
