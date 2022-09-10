@@ -38,8 +38,8 @@ fn diffuse(N:i32, b:i32, mut x:Vec<f32>, x0:&Vec<f32>, diff:f32, dt:f32) -> Vec<
 
 fn advect(N:i32, b:i32, mut d:Vec<f32>, d0:&Vec<f32>, u:&Vec<f32>, v:&Vec<f32>, dt:f32) -> Vec<f32>
 {
-    let (i0, j0, i1, j1):(i32, i32, i32, i32);
-    let (x, y, s0, t0, s1, t1, dt0):(f32, f32, f32, f32, f32, f32, f32);
+    let (mut i0, mut j0, mut i1, mut j1):(i32, i32, i32, i32);
+    let (mut x, mut y, mut s0, mut t0, mut s1, mut t1, mut dt0):(f32, f32, f32, f32, f32, f32, f32);
 
     let dt0 = dt*N as f32;
     for i in 1..N{
@@ -138,7 +138,7 @@ pub fn set_bnd(N:i32, b:i32, mut x:Vec<f32>) -> Vec<f32>
     return x;
 }
 
-pub fn init_density(N:i32, d:Vec<f32>) -> Vec<f32>{
+pub fn init_density(N:i32, mut d:Vec<f32>) -> Vec<f32>{
     for x in 1..(N+1){
         for y in 1..(N+1){
             if x > N/2{
@@ -150,7 +150,7 @@ pub fn init_density(N:i32, d:Vec<f32>) -> Vec<f32>{
     return d;
 }
 
-pub fn init_velocity(N:i32, u:Vec<f32>, v:Vec<f32>) -> (Vec<f32>, Vec<f32>){
+pub fn init_velocity(N:i32, mut u:Vec<f32>, mut v:Vec<f32>) -> (Vec<f32>, Vec<f32>){
     for x in 1..(N+1){
         for y in 1..(N+1){
             let (velocity_init_x, velocity_init_y):(f32, f32) = ((x as f32-(N/2) as f32), (y as f32-(N/2) as f32));

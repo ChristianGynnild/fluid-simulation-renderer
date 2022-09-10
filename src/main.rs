@@ -27,7 +27,7 @@ fn main(){
 
 
     std::fs::create_dir_all("images");
-    let filepath;
+    let mut filepath;
 
     for i in 0..100{        
         filepath = format!("images/output{}.png", i);

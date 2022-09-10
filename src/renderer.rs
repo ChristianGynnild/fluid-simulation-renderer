@@ -1,7 +1,7 @@
 use image::RgbImage;
 
-const WIDTH:usize = super::WIDTH;
-const HEIGHT:usize = super::HEIGHT;
+const WIDTH:usize = super::WIDTH as usize;
+const HEIGHT:usize = super::HEIGHT as usize;
 
 fn save_image(vector:Vec<u8>, filepath:&str){
     RgbImage::from_raw(WIDTH as u32, HEIGHT as u32, vector).unwrap().save(filepath).unwrap();
