@@ -3,9 +3,6 @@ use renderer::render;
 mod simulation;
 use simulation::IX;
 
-pub const WIDTH:i32 = 200;
-pub const HEIGHT:i32 = 200;
-
 pub const N:i32 = 64;
 
 fn main(){

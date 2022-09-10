@@ -1,5 +1,6 @@
-const WIDTH:i32=super::WIDTH;
-const HEIGHT:i32=super::HEIGHT;
+const _N:i32=super::N;
+
+
 
 
 fn lerp(a:f32, b:f32, interpolation_value:f32)->f32{
@@ -7,7 +8,7 @@ fn lerp(a:f32, b:f32, interpolation_value:f32)->f32{
 }
 
 pub fn IX(x:i32,y:i32) -> usize{
-    return x as usize+y as usize*(WIDTH as usize+2);
+    return x as usize+y as usize*(_N as usize+2);
 }
 
 fn add_source(N:i32, mut x:Vec<f32>, mut s:&Vec<f32>, dt:f32) -> Vec<f32>
@@ -139,8 +140,8 @@ pub fn set_bnd(N:i32, b:i32, mut x:Vec<f32>) -> Vec<f32>
 }
 
 pub fn init_density(N:i32, mut d:Vec<f32>) -> Vec<f32>{
-    for x in 1..(N+1){
-        for y in 1..(N+1){
+    for x in 1..N{
+        for y in 1..N{
             if x > N/2{
                 d[IX(x,y)] = 1.;
             }
@@ -153,8 +154,8 @@ pub fn init_density(N:i32, mut d:Vec<f32>) -> Vec<f32>{
 }
 
 pub fn init_velocity(N:i32, mut u:Vec<f32>, mut v:Vec<f32>) -> (Vec<f32>, Vec<f32>){
-    for x in 1..(N+1){
-        for y in 1..(N+1){
+    for x in 1..N{
+        for y in 1..N{
             let (velocity_init_x, velocity_init_y):(f32, f32) = ((x as f32-(N/2) as f32), (y as f32-(N/2) as f32));
             (u[IX(x,y)], v[IX(x,y)]) = (-velocity_init_y, velocity_init_x);
         }
