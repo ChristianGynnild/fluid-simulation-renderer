@@ -57,6 +57,18 @@ fn advect(N:i32, b:i32, mut d:Vec<f32>, d0:&Vec<f32>, u:&Vec<f32>, v:&Vec<f32>, 
     return d;
 }
 
+
+fn dens_step(N:i32, mut x:Vec<f32>, mut x0:Vec<f32>, u:&Vec<f32>, v:&Vec<f32>, diff:f32, dt:f32) -> (Vec<f32>, Vec<f32>)
+{
+    add_source ( N, x, &x0, dt );
+    (x,x0) = (x0, x); 
+    diffuse ( N, 0, x, &x0, diff, dt );
+    (x,x0) = (x0, x);
+    advect ( N, 0, x, &x0, u, v, dt );
+
+    return (x, x0);
+}
+
 pub fn remove_divergence(mut velocity_x:Vec<f32>, mut velocity_y:Vec<f32>) -> (Vec<f32>, Vec<f32>){
     
     let mut divergence = vec![0.;(WIDTH+2)*(HEIGHT+2)];
