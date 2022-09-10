@@ -147,6 +147,8 @@ pub fn init_density(N:i32, mut d:Vec<f32>) -> Vec<f32>{
         }
     }
 
+    d = set_bnd(N, 0, d);
+
     return d;
 }
 
@@ -157,6 +159,9 @@ pub fn init_velocity(N:i32, mut u:Vec<f32>, mut v:Vec<f32>) -> (Vec<f32>, Vec<f3
             (u[IX(x,y)], v[IX(x,y)]) = (-velocity_init_y, velocity_init_x);
         }
     }
+
+    u = set_bnd(N, 1, u);
+    v = set_bnd(N, 2, v);
 
     return (u, v);
 }

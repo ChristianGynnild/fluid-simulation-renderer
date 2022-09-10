@@ -22,8 +22,11 @@ fn main(){
     let diff = 0.0001;
     let dt = 0.01;
 
-    dens_prev = simulation::set_bnd(N, 0, dens_prev);
-    (u, v, u_prev, v_prev) = (u_prev, v_prev, u, v);
+    dens = simulation::init_density(N, dens);
+    dens_prev = simulation::init_density(N, dens_prev);
+
+    (u, v) = simulation::init_velocity(N, u,v);
+    (u_prev, v_prev) = simulation::init_velocity(N, u_prev,v_prev);
 
 
     std::fs::create_dir_all("images");
