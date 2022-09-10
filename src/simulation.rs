@@ -153,11 +153,11 @@ pub fn init_density(N:i32, mut d:Vec<f32>) -> Vec<f32>{
     return d;
 }
 
-pub fn init_velocity(N:i32, mut u:Vec<f32>, mut v:Vec<f32>) -> (Vec<f32>, Vec<f32>){
+pub fn init_velocity(N:i32, amount:f32, mut u:Vec<f32>, mut v:Vec<f32>) -> (Vec<f32>, Vec<f32>){
     for x in 1..N{
         for y in 1..N{
             let (velocity_init_x, velocity_init_y):(f32, f32) = ((x as f32-(N/2) as f32), (y as f32-(N/2) as f32));
-            (u[IX(x,y)], v[IX(x,y)]) = (-velocity_init_y, velocity_init_x);
+            (u[IX(x,y)], v[IX(x,y)]) = (-velocity_init_y*amount, velocity_init_x*amount);
         }
     }
 
