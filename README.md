@@ -1,4 +1,4 @@
-# fluid-simulation-cpu
+# fluid-simulation-renderer
 
 An fluid simulation renderer made with rust.
 
